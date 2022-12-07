@@ -24,7 +24,7 @@ $(document).ready(function() {
   }
 
   function change_gamestate(room_code) {
-    url = "http://127.0.0.1:5000/gamecontroller/" + room_code + "/change"
+    url = `http://${window.location.host}/gamecontroller/` + room_code + "/change"
     console.log("change game")
     fetch(url).then(function(response) {
         sessionStorage.setItem("page","score")
@@ -36,7 +36,7 @@ $(document).ready(function() {
 
   function check_choices() {
     room = sessionStorage.getItem("id")
-    url = "http://127.0.0.1:5000/room/" + room + "/check_choices"
+    url = `http://${window.location.host}/room/` + room + "/check_choices"
     fetch(url).then(function(response) {
       response.json().then(function(data) {
         if (data == "0") {
@@ -54,7 +54,7 @@ $(document).ready(function() {
 
   function submit_guess(data) {
     room = sessionStorage.getItem("id")
-    url = "http://127.0.0.1:5000/player/" + room + "/set_choice"
+    url = `http://${window.location.host}/player/` + room + "/set_choice"
     fetch(url,
       {
         headers: {
@@ -87,7 +87,7 @@ $(document).ready(function() {
 
   function get_guesses() {
     room = sessionStorage.getItem("id")
-    url = "http://127.0.0.1:5000/player/" + room + "/all_guesses"
+    url = `http://${window.location.host}/player/` + room + "/all_guesses"
     fetch(url).then(function(response) {
       response.json().then(function(data) {
         console.log(data)

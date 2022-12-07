@@ -12,6 +12,7 @@ import os
 
 # TODO: Unify bodies of PUT requests room_id should be same for every request
 # TODO: Unify URLs for room_id, have passed in url not body
+
 # TODO: Create funciton for getting prompt for the current round
 # TODO: Beautify the UI!
 
@@ -63,13 +64,14 @@ def get_specific_room(room_id):
 """ Return all rooms """
 @app.route("/room",methods=["GET"])
 def get_all_rooms():
-    return jsonify(map(lambda x:x.serialize(),Room.query.all()))
+    return jsonify(list(map(lambda x:x.serialize(),Room.query.all())))
 
 # TODO: Clear old file creation stuff
 """ Creates a room
     Takes body: name """
 @app.route("/room",methods=["PUT"])
 def create_room():
+    print("danx create room")
     rc = generate_room_code()
     host = str(request.json["name"])
     gameState = 0
@@ -86,18 +88,22 @@ def create_room():
 """ Return list of all players """
 @app.route("/player",methods=["GET"])
 def get_player():
-    return jsonify(map(lambda x:x.serialize(),Player.query.all()))
+    print("danx get player")
+    return jsonify(list(map(lambda x:x.serialize(),Player.query.all())))
 
 """ Returns all players in <room_id> """
 @app.route("/player/<string:room_id>",methods=["GET"])
 def get_all_player_in_room(room_id):
+    print("danx get all player in room")
     players = Player.query.filter_by(id=room_id).all()
-    return jsonify(map((lambda x: x.serialize()),players))
+    r = list(map((lambda x: x.serialize()),players))
+    return jsonify(r)
 
 """ Adds a new player
     Takes body: name, room """
 @app.route("/player",methods=["PUT"])
 def add_player():
+    print("danx add player")
     room = str(request.json["room"])
     name = str(request.json["name"])
     target_room = Room.query.get_or_404(room)
@@ -121,6 +127,7 @@ def add_player():
     body: id,name,image """
 @app.route("/player/submitimage", methods=["PUT"])
 def add_image():
+    print("danx add image")
     player = request.json["name"]
     room = request.json["id"]
     Player.query.filter_by(id=room,name=player).update(dict(drawing=json.dumps(request.json["image"])))
@@ -130,6 +137,7 @@ def add_image():
 # TODO: clean up (may be from old set up)
 @app.route("/room/<string:room_id>/players", methods=["GET"])
 def num_players_in_room(room_id):
+    print("danx num players in room")
     room = Room.query.filter_by(id=room_id).first()
     if room == None:
         abort(404)
@@ -138,6 +146,7 @@ def num_players_in_room(room_id):
 # TODO: clean up (may be from old set up)
 @app.route("/room/<string:room_id>/players", methods=["PUT"])
 def add_player_to_room(room_id):
+    print("danx add player to room")
     room = Room.query.filter_by(id=room_id).first()
     add_one_player = str(int(room.players) + 1)
     Room.query.filter_by(id=room_id).update(dict(players=add_one_player))
@@ -146,21 +155,24 @@ def add_player_to_room(room_id):
 
 @app.route("/player/<string:room_id>/<string:name>/prompt", methods=["GET"])
 def get_prompt(room_id,name):
+    print("danx get prompt")
     prompt = Player.query.filter_by(id=room_id,name=name).first().prompt
     return jsonify(prompt)
 
 """ Returns number of players who have submitted an image """
 @app.route("/room/<string:room_id>/check_subs",methods=["GET"])
 def check_everyone_submitted(room_id):
-    submissions = filter(lambda x: x.drawing == u'', Player.query.filter_by(id=room_id).all())
+    print("danx check everyone submitted")
+    submissions = list(filter(lambda x: x.drawing == u'', Player.query.filter_by(id=room_id).all()))
     if submissions == None:
         return jsonify(0)
     return jsonify(len(submissions))
 
 @app.route("/room/<string:room_id>/check_choices", methods=["GET"])
 def check_everyone_chosen(room_id):
+    print("danx check everyone chosen")
     room = room_id
-    choices = filter(lambda x: len(x.choice) == 0, Player.query.filter_by(id=room_id).all())
+    choices = list(filter(lambda x: len(x.choice) == 0, Player.query.filter_by(id=room_id).all()))
     if len(choices) == 1:
         return jsonify(0)
     return jsonify(len(choices))
@@ -169,6 +181,7 @@ def check_everyone_chosen(room_id):
     Else returns time left before forced submission"""
 @app.route("/gamecontroller/<string:room_id>/time")
 def check_time(room_id):
+    print("danx checktime")
     start_time = Room.query.filter_by(id=room_id).first().start_time
     current_time = int(time.time())
     if (start_time + 60 < current_time):
@@ -179,6 +192,7 @@ def check_time(room_id):
 """ Starts the timer for <room_id> """
 @app.route("/gamecontroller/<string:room_id>/start_timer")
 def start_time(room_id):
+    print("danx start time")
     cur_time = int(time.time())
     Room.query.filter_by(id=room_id).update(dict(start_time=cur_time))
     db.session.commit()
@@ -186,9 +200,10 @@ def start_time(room_id):
 
 
 def add_prompts(room_id):
+    print("danx add prompts")
     players = Player.query.filter_by(id=room_id).all()
     num_players = len(players)
-    all_prompts = map(lambda x:  x.text, Prompt.query.all())
+    all_prompts = list(map(lambda x:  x.text, Prompt.query.all()))
     random.shuffle(all_prompts)
     sliced_prompts = all_prompts[:num_players]
     for i,p in enumerate(players):
@@ -198,6 +213,7 @@ def add_prompts(room_id):
 """ Changes the game state to signal clients to change mode """
 @app.route("/gamecontroller/<string:room_id>/change",methods=["GET"])
 def change_gamestate(room_id):
+    print("danx change gamestate "+room_id)
     room = str(room_id)
     target_room = Room.query.get_or_404(room)
     current_gamestate = target_room.gameState
@@ -214,6 +230,7 @@ def change_gamestate(room_id):
     Takes body: room, name, guess """
 @app.route("/player/<string:room_id>/submitdrawing", methods=["PUT"])
 def submit_drawing(room_id):
+    print("danx submit drawing")
     room = str(room_id)
     name = request.json["name"]
     drawing = request.json["drawing"]
@@ -225,14 +242,16 @@ def submit_drawing(room_id):
 """ Return the name of the owner of the current picture """
 @app.route("/room/<string:room_id>/imageowner", methods=["GET"])
 def get_image_owner(room_id):
+    print("danx get image owner")
     viewing = Room.query.filter_by(id=room_id).first().viewing
-    players = map(lambda x: x.name, Player.query.filter_by(id=room_id).all())
+    players =list(map(lambda x: x.name, Player.query.filter_by(id=room_id).all()))
     return jsonify(players[viewing])
 
 """ Return a picture and increment viewing or end flag """
 @app.route("/room/<string:room_id>/image",methods=["GET"])
 def get_next_image(room_id):
-    images = map(lambda x: x.drawing, Player.query.filter_by(id=room_id).all())
+    print("danx get next image")
+    images = list(map(lambda x: x.drawing, Player.query.filter_by(id=room_id).all()))
     toReturn = Room.query.filter_by(id=room_id).first().viewing
     if toReturn >= len(images):
         return jsonify("End")
@@ -243,6 +262,7 @@ def get_next_image(room_id):
     Takes body: name, guess """
 @app.route("/player/<string:room_id>/guess",methods=["PUT"])
 def submit_guess(room_id):
+    print("danx submit guess")
     name = request.json["name"]
     guess = request.json["guess"]
     Player.query.filter_by(id=room_id,name=name).update(dict(guess=guess))
@@ -253,7 +273,8 @@ def submit_guess(room_id):
 """ Get number of players who have not guessed """
 @app.route("/player/<string:room_id>/check_guesses",methods=["GET"])
 def get_num_guesses(room_id):
-    guesses = filter(lambda x: x.guess == u'', Player.query.filter_by(id=room_id).all())
+    print("danx get num guesses")
+    guesses = list(filter(lambda x: x.guess == u'', Player.query.filter_by(id=room_id).all()))
     if len(guesses) == 1:
         # everyone has guessed
         return jsonify(0)
@@ -270,6 +291,7 @@ def add_score_to_players(owner,guesser,room_id):
 # TODO: Fix function so extreme case are accounted for ie. player picking their own
 @app.route("/room/<string:room_id>/finishRound")
 def finish_round(room_id):
+    print("danx finish round")
     room = str(room_id)
     viewing = Room.query.filter_by(id=room).first().viewing
     prompt =  Player.query.filter_by(id=room).all()[viewing].prompt
@@ -297,25 +319,30 @@ def finish_round(room_id):
 """ Check if round has been evalulated """
 @app.route("/room/<string:room_id>/check_scored")
 def check_scored(room_id):
+    print("danx check scored")
     room = str(room_id)
     return jsonify(Room.query.filter_by(id=room).first().scoresUpdated)
 """ Gets all guesses """
 @app.route("/player/<string:room_id>/all_guesses", methods=["GET"])
 def get_all_guesses(room_id):
-     room = str(room_id)
-     viewing = Room.query.filter_by(id=room).first().viewing
-     prompt = Player.query.filter_by(id=room).all()[viewing].prompt
-     images = map(lambda x:x.drawing, Player.query.filter_by(id=room).all())
-     all_guesses = map(lambda x: {'name':x.name, 'guess':x.guess}, Player.query.filter_by(id=room).all())
-     remove_empty = filter(lambda x: x["guess"] != u'', all_guesses)
-     prompt_and_guesses = {'image':images[viewing], 'truth':prompt, 'guesses':remove_empty}
-     return jsonify(prompt_and_guesses)
+    print("danx get all guesses")
+    room = str(room_id)
+    viewing = Room.query.filter_by(id=room).first().viewing
+    prompt = Player.query.filter_by(id=room).all()[viewing].prompt
+    images = list(map(lambda x:x.drawing, Player.query.filter_by(id=room).all()))
+    all_guesses = list(map(lambda x: {'name':x.name, 'guess':x.guess}, Player.query.filter_by(id=room).all()))
+    remove_empty = list(filter(lambda x: x["guess"] != u'', all_guesses))
+    prompt_and_guesses = {'image':images[viewing], 'truth':prompt, 'guesses':remove_empty}
+    return jsonify(prompt_and_guesses)
 
 @app.route("/player/<string:room_id>/set_choice",methods=["PUT"])
 def set_player_choice(room_id):
+    print("danx set player choice")
     room = str(room_id)
     choice = request.json["choice"]
     player = request.json["name"]
+    #TODO, look up player by name?
+    Player.query.filter_by(id=room_id,name=name).update(dict(guess=guess))
     updated = Player.query.filter_by(id=room_id,name=player).update(dict(choice=choice))
 
     viewing = Room.query.filter_by(id=room).first().viewing
@@ -326,24 +353,27 @@ def set_player_choice(room_id):
     else:
         lier = Player.query.filter_by(id=room_id,guess=player.choice).first()
         lier_score = int(lier.score)
-        Player.query.filter_by(id=room,name=lier.name).update(dict(score=lier_score + 100))
+        owner = Player.query.filter_by(id=room,name=lier.name).update(dict(score=lier_score + 100))
     db.session.commit()
-    return jsonify(new_player)
+    return jsonify(owner)
+    # return jsonify(new_player)
 
 
 
 """ Retunrs ordered the scoreboard """
 @app.route("/room/<string:room_id>/scores", methods=["GET"])
 def get_scores(room_id):
+    print("danx get scores")
     room = str(room_id)
     scores = Player.query.filter_by(id=room).order_by(Player.score).all()
-    return jsonify(map(lambda x: x.serialize(), scores))
+    return jsonify(list(map(lambda x: x.serialize(), scores)))
 
 """ Construction Zone """
 """ Resets gamestate to guessing if another round can happen else end """
 @app.route("/gamecontroller/<string:room_id>/next")
 def get_next_stage(room_id):
-    images = map(lambda x: x.drawing, Player.query.filter_by(id=room_id).all())
+    print("danx get next stage")
+    images = list(map(lambda x: x.drawing, Player.query.filter_by(id=room_id).all()))
     images_viewed = Room.query.filter_by(id=room_id).first().viewing
     Room.query.filter_by(id=room_id).update(dict(gameState=2,scoresUpdated=0,viewing=images_viewed+1))
     Player.query.filter_by(id=room_id).update(dict(choice=u'',guess=u''))
@@ -353,7 +383,8 @@ def get_next_stage(room_id):
 """ Get gamestate """
 @app.route("/gamecontroller/<string:room_id>/state")
 def get_state(room_id):
+    print("danx get state")
     state = Room.query.filter_by(id=room_id).first().gameState
     return jsonify(state)
 if __name__ == "__main__":
-    app.run(debug=True,threaded=True)
+    app.run(host='0.0.0.0', debug=True,threaded=True)

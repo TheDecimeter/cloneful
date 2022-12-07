@@ -26,7 +26,7 @@ function draw(clickX,clickY,clickDrag) {
 function submit_guess() {
   console.log("guess")
   room_id = sessionStorage.getItem("id")
-  url = "http://127.0.0.1:5000/player/" + room_id + "/guess"
+  url = `http://${window.location.host}/player/` + room_id + "/guess"
   n = sessionStorage.getItem("name");
   console.log($('#guess_input').val())
   data = JSON.stringify({ name:n,
@@ -53,7 +53,7 @@ function submit_guess() {
 function get_image() {
   console.log("image")
   room_id = sessionStorage.getItem("id")
-  url = "http://127.0.0.1:5000/room/" + room_id + "/image"
+  url = `http://${window.location.host}/room/` + room_id + "/image"
   fetch(url).then(function(response) {
     response.json().then(function(data) {
         if (data == "End") {
@@ -74,7 +74,7 @@ function get_image() {
 $(document).ready(function() {
 
   function change_gamestate(room_code) {
-    url = "http://127.0.0.1:5000/gamecontroller/" + room_code + "/change"
+    url = `http://${window.location.host}/gamecontroller/` + room_code + "/change"
     console.log("change game")
     fetch(url).then(function(response) {
         sessionStorage.setItem("page","choose")
@@ -87,7 +87,7 @@ $(document).ready(function() {
 
   function check_guesses() {
     room_id = sessionStorage.getItem("id")
-    url = "http://127.0.0.1:5000/player/" + room_id + "/check_guesses"
+    url = `http://${window.location.host}/player/` + room_id + "/check_guesses"
     fetch(url).then(function(response) {
 
       response.json().then(function(data) {

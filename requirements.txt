@@ -1,5 +1,5 @@
 alembic==1.0.0
-bson==0.5.2
+bson>=0.5.2
 certifi==2018.8.24
 click==6.7
 Flask==1.0.2
@@ -14,6 +14,6 @@ MarkupSafe==1.0
 marshmallow==2.15.1
 python-dateutil==2.7.3
 python-editor==1.0.3
-six==1.11.0
+six>=1.11.0
 SQLAlchemy==1.2.12
 Werkzeug==0.14.1

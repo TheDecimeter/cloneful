@@ -3,7 +3,7 @@
 $(document).ready(function() {
   function get_scores(end_flag) {
     room_id = sessionStorage.getItem("id")
-    url = "http://127.0.0.1:5000/room/" + room_id + "/scores"
+    url = `http://${window.location.host}/room/` + room_id + "/scores"
     fetch(url).then(function(response) {
       response.json().then(function(data) {
         show_scores(data,end_flag)
@@ -32,7 +32,7 @@ $(document).ready(function() {
 
   function check_if_scores_updated(c) {
     room_id = sessionStorage.getItem("id")
-    url = "http://127.0.0.1:5000/room/" + room_id + "/check_scored"
+    url = `http://${window.location.host}/room/` + room_id + "/check_scored"
     fetch(url).then(function(response) {
       response.json().then(function(data) {
         if (data == 1) {
@@ -74,7 +74,7 @@ $(document).ready(function() {
 
   function trigger_eval() {
     room_id = sessionStorage.getItem("id")
-    url = "http://127.0.0.1:5000/room/" + room_id + "/finishRound"
+    url = `http://${window.location.host}/room/` + room_id + "/finishRound"
     fetch(url).then(function(response) {
       response.json().then(function(data) {
         console.log(data)
@@ -92,7 +92,7 @@ $(document).ready(function() {
   }
   function continue_button() {
     room_id = sessionStorage.getItem("id")
-    url = "http://127.0.0.1:5000/gamecontroller/" + room_id + "/next"
+    url = `http://${window.location.host}/gamecontroller/` + room_id + "/next"
     fetch(url).then(function(response){
       response.json().then(function(data) {
         sessionStorage.setItem("page","guess")
@@ -102,7 +102,7 @@ $(document).ready(function() {
   }
   function check_for_next_round() {
     room_id = sessionStorage.getItem("id")
-    url = "http://127.0.0.1:5000/gamecontroller/" + room_id + "/state"
+    url = `http://${window.location.host}/gamecontroller/`+ room_id + "/state"
     fetch(url).then(function(response) {
       response.json().then(function(data) {
         if (data == "2") {

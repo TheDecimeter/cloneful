@@ -9,7 +9,7 @@ $(document).ready(function() {
 
     function check_for_submissions() {
       room = sessionStorage.getItem("id")
-      url = "http://127.0.0.1:5000/room/" + room + "/check_subs"
+      url = `http://${window.location.host}/room/` + room + "/check_subs"
       fetch(url).then(function(response) {
         response.json().then(function(data) {
           console.log(data)
@@ -30,7 +30,7 @@ $(document).ready(function() {
     }
 
     function get_time(room) {
-      url = "http://127.0.0.1:5000/gamecontroller/" + room + "/time"
+      url = `http://${window.location.host}/gamecontroller/` + room + "/time"
       fetch(url).then(function(response) {
         response.json().then(function(data) {
 
@@ -59,7 +59,7 @@ $(document).ready(function() {
       j = to_json(clickX,clickY,clickDrag)
       room_id = sessionStorage.getItem("id")
       n = sessionStorage.getItem("name")
-      url = "http://127.0.0.1:5000/player/" + room_id + "/submitdrawing"
+      url = `http://${window.location.host}/player/` + room_id + "/submitdrawing"
       fetch(url,
           {
             method: "PUT",
@@ -80,7 +80,7 @@ $(document).ready(function() {
       }
     function change_gamestate(room_code) {
 
-        url = "http://127.0.0.1:5000/gamecontroller/" + room_code + "/change"
+        url = `http://${window.location.host}/gamecontroller/` + room_code + "/change"
         fetch(url).then(function(response) {
           sessionStorage.setItem("page","guess")
           location.reload(true)
@@ -91,7 +91,7 @@ $(document).ready(function() {
 
     function start_timer() {
       room = sessionStorage.getItem("id")
-      url = "http://127.0.0.1:5000/gamecontroller/" + room + "/start_timer"
+      url = `http://${window.location.host}/gamecontroller/` + room + "/start_timer"
       fetch(url).then(function(response) {
         var intervalId = window.setInterval(check_for_submissions, 1000)
       }).catch(function(err) {
@@ -102,7 +102,7 @@ $(document).ready(function() {
     function get_prompt() {
       room_id = sessionStorage.getItem("id")
       name = sessionStorage.getItem("name")
-      url = "http://127.0.0.1:5000/player/" + room_id + "/" + name + "/prompt"
+      url = `http://${window.location.host}/player/` + room_id + "/" + name + "/prompt"
       fetch(url).then(function(response) {
         response.json().then(function(data) {
           $('#prompt_text').text(data)

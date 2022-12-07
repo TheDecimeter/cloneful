@@ -13,7 +13,7 @@ $(document).ready(function() {
 
   function check_guesses() {
     room_id = sessionStorage.getItem("id")
-    url = "http://127.0.0.1:5000/player/" + room_id + "/check_guesses"
+    url = `http://${window.location.host}/player/` + room_id + "/check_guesses"
     fetch(url).then(function(response) {
 
       response.json().then(function(data) {

@@ -1,10 +1,15 @@
 // TODO: Create URL config
 
+function v(v, d={value:""}){
+  if(v)
+    return v;
+  else return d;
+}
 
 function create_game() {
-  input_name = document.getElementById("name").value
+  input_name = v(document.getElementById("name")).value
   sessionStorage.setItem('name', input_name);
-  url = "http://127.0.0.1:5000/room"
+  url = `http://${window.location.host}/room`
   fetch(url, {
     method: "PUT",
     body: JSON.stringify({name:input_name}),
@@ -16,20 +21,20 @@ function create_game() {
       sessionStorage.setItem("id", data["id"]);
       sessionStorage.setItem("page","waiting_room")
       sessionStorage.setItem("host","true")
-      location.reload(true)
+      location.reload()
     })
   })
 }
 function join_game() {
-  room_code = document.getElementById("room").value
-  input_name = document.getElementById("name").value
+  room_code = v(document.getElementById("room")).value
+  input_name = v(document.getElementById("name")).value
   if (room_code === undefined) {
     console.log("Room code from input is undefined!")
     return
   }
   put_data = JSON.stringify({name:input_name,room:room_code})
   console.log(put_data)
-  url = "http://127.0.0.1:5000/player"
+  url = `http://${window.location.host}/player`
   fetch(url,
     {
       method: "PUT",
@@ -46,9 +51,9 @@ function join_game() {
   })
 }
 function increase_player_number(room_id) {
-  url = "http://127.0.0.1:5000/room/" + room_id + "/players"
+  url = `http://${window.location.host}/room/${room_id}/players`
   fetch(url).then(function(response) {
-    location.reload(true)
+    location.reload()
   }).catch(function(err) {
     console.log(err)
   })
@@ -73,7 +78,7 @@ function check_owner(page) {
   if (room_id == "") {
     return ""
   }
-  url = "http://127.0.0.1:5000/room/" + room_id + "/imageowner"
+  url = `http://${window.location.host}/room/${room_id}/imageowner`
   fetch(url).then(function(response) {
     response.json().then(function(data) {
       stored_name = sessionStorage.getItem("name")
@@ -109,7 +114,7 @@ $(document).ready(function() {
       sessionStorage.setItem("page",pages.pop())
       sessionStorage.setItem("h",JSON.stringify(pages))
       console.log(sessionStorage.getItem("page"))
-      location.reload(true)
+      location.reload()
     }
   });
   //check if room is still active

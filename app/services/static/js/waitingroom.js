@@ -7,7 +7,7 @@ $(document).ready(function() {
   display_player_names()
 });
 function display_player_names() {
-  url = "http://127.0.0.1:5000/player/" + room_code
+  url = `http://${window.location.host}/player/` + room_code
   fetch(url).then(function(response) {
       console.log(response.status);
       response.json().then(function(data) {
@@ -33,7 +33,7 @@ function display_player_names() {
 }
 
 function updateGame(room_code) {
-  url = "http://127.0.0.1:5000/gamecontroller/" + room_code + "/change"
+  url = `http://${window.location.host}/gamecontroller/` + room_code + "/change"
 
   fetch(url).then(function(response) {
     response.json().then(function(data) {
@@ -47,7 +47,7 @@ function updateGame(room_code) {
   });
 }
 function startGameButton(room_code) {
-  url = "http://127.0.0.1:5000/room/" + room_code
+  url = `http://${window.location.host}/room/` + room_code
   fetch(url).then(function(response) {
     response.json().then(function(data) {
         user_name = sessionStorage.getItem("name")
@@ -76,7 +76,7 @@ function startGameButton(room_code) {
 
 function checkforchange() {
   room_code = sessionStorage.getItem("id")
-  url = "http://127.0.0.1:5000/player/" + room_code
+  url = `http://${window.location.host}/player/` + room_code
 
   fetch(url).then(function(response) {
       if (response.status !== 200) {
@@ -111,7 +111,7 @@ function checkforchange() {
 }
 
 function checkforstart(room_code) {
-  url = "http://127.0.0.1:5000/room/" + room_code
+  url = `http://${window.location.host}/room/` + room_code
 
   fetch(url).then(function(response) {
     response.json().then(function(data) {
