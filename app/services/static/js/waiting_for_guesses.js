@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
   function change_gamestate(room_code) {
-    url = "http://127.0.0.1:5000/gamecontroller/" + room_code + "/change"
+    url = `http://${window.location.host}/gamecontroller/` + room_code + "/change"
     console.log("change game")
     fetch(url).then(function(response) {
         sessionStorage.setItem("page","choose")

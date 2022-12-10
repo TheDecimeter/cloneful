@@ -341,22 +341,20 @@ def set_player_choice(room_id):
     room = str(room_id)
     choice = request.json["choice"]
     player = request.json["name"]
-    #TODO, look up player by name?
-    Player.query.filter_by(id=room_id,name=name).update(dict(guess=guess))
-    updated = Player.query.filter_by(id=room_id,name=player).update(dict(choice=choice))
+    Player.query.filter_by(id=room_id,name=player).update(dict(choice=choice))
 
     viewing = Room.query.filter_by(id=room).first().viewing
-    prompt =  Player.query.filter_by(id=room).all()[viewing].prompt
+    p= Player.query.filter_by(id=room).all()[viewing]
+    prompt =  p.prompt
     if (choice == prompt):
         owner = Player.query.filter_by(id=room,guess=u'').first().name
         add_score_to_players(owner,player,room)
     else:
-        lier = Player.query.filter_by(id=room_id,guess=player.choice).first()
+        lier = Player.query.filter_by(id=room_id,guess=p.choice).first()
         lier_score = int(lier.score)
-        owner = Player.query.filter_by(id=room,name=lier.name).update(dict(score=lier_score + 100))
+        Player.query.filter_by(id=room,name=lier.name).update(dict(score=lier_score + 100))
     db.session.commit()
-    return jsonify(owner)
-    # return jsonify(new_player)
+    return ""
 
 
 
